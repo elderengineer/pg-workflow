@@ -5,6 +5,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 While pre-1.0, a **minor** version may contain breaking changes.
 
+## [0.1.1] - 2026-09-15
+
+Dev toolchain refresh. No runtime changes.
+
+### Changed
+
+- Development dependencies: jest 29 → 30, eslint 9 → 10, TypeScript 5 → 6,
+  `@types/node` 20 → 26, `@types/jest` 29 → 30,
+  `eslint-config-prettier` 9 → 10, `actions/checkout` 4 → 7,
+  `actions/setup-node` 7.
+- TypeScript stays on v6 (not v7): `ts-jest@29` requires `typescript <7` and
+  `typescript-eslint@8` requires `<6.1`. Dependabot is configured to ignore
+  `typescript >= 7` until both support it.
+- Added explicit `rootDir: "."` to `tsconfig.json`, required by TypeScript 6
+  with declaration emit on (TS5011 under ts-jest).
+
 ## [0.1.0] - 2026-09-15
 
 The first release. Breaking by nature — it is the initial extraction.
