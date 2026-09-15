@@ -1,6 +1,6 @@
 {
   "name": "pg-workflow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Standalone queue-agnostic workflow engine with pluggable queue backends and observability hooks.",
   "license": "MIT",
   "main": "dist/index.js",
