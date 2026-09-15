@@ -10,6 +10,11 @@ updates:
         dependency-type: production
       development:
         dependency-type: development
+    # Revisit when ts-jest and typescript-eslint support TypeScript 7
+    # (ts-jest@29 needs typescript <7, typescript-eslint@8 needs <6.1).
+    ignore:
+      - dependency-name: "typescript"
+        versions: [">=7"]
 
   - package-ecosystem: github-actions
     directory: /
