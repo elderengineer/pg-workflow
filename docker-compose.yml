@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pg-workflow-postgres
+    environment:
+      POSTGRES_USER: pgworkflow
+      POSTGRES_PASSWORD: pgworkflow
+      POSTGRES_DB: pgworkflow
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pgworkflow -d pgworkflow"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    tmpfs:
+      - /var/lib/postgresql/data
