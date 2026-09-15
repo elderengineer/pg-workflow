@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: build / lint / format / unit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run lint
+      - run: npm run format
+      - run: npm test
+
+  integration:
+    name: integration (postgres)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pgworkflow
+          POSTGRES_PASSWORD: pgworkflow
+          POSTGRES_DB: pgworkflow
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pgworkflow -d pgworkflow"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PG_URL: postgres://pgworkflow:pgworkflow@localhost:5432/pgworkflow
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test:integration

@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: build, test, publish to GitHub
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pgworkflow
+          POSTGRES_PASSWORD: pgworkflow
+          POSTGRES_DB: pgworkflow
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pgworkflow -d pgworkflow"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PG_URL: postgres://pgworkflow:pgworkflow@localhost:5432/pgworkflow
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run lint
+      - run: npm run format
+      - run: npm test
+      - run: npm run test:integration
+      - name: Pack
+        run: npm pack
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --notes-file CHANGELOG.md \
+            pg-workflow-*.tgz
