@@ -5,7 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 While pre-1.0, a **minor** version may contain breaking changes.
 
-## [Unreleased]
+## [0.1.0] - 2026-09-15
 
 The first release. Breaking by nature — it is the initial extraction.
 
