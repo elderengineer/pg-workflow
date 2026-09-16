@@ -14,6 +14,13 @@ While pre-1.0, a **minor** version may contain breaking changes.
   DDL: a least-privilege role with only `SELECT`/`INSERT`/`UPDATE`/`DELETE` cannot
   run `CREATE TABLE` or `CREATE INDEX`, so the store must not attempt `migrate()`.
 
+### Fixed
+
+- `PostgresRunStore` with a `schema` option emitted schema-qualified index names
+  (`create index ... "schema".pg_workflow_run_by_status`), which Postgres rejects:
+  an index name cannot carry a schema. The table is still qualified; the index
+  name is now unqualified, so it is created beside its table.
+
 ## [0.1.2] - 2026-09-16
 
 Publish to GitHub Packages. The published name is scoped to the owner, so the

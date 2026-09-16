@@ -168,6 +168,8 @@ interface RunRow {
  */
 export class PostgresRunStore implements RunStore {
   private readonly db: SqlExecutor;
+  /** Unqualified run-table name, used for its index names (an index name cannot be schema-qualified). */
+  private readonly runTableName: string;
   private readonly runTable: string;
   private readonly stepTable: string;
   private readonly ensureSchema: boolean;
@@ -177,7 +179,8 @@ export class PostgresRunStore implements RunStore {
     this.db = options.db;
     const prefix = options.tablePrefix ?? "pg_workflow";
     const schema = options.schema ? `"${options.schema}".` : "";
-    this.runTable = `${schema}${prefix}_run`;
+    this.runTableName = `${prefix}_run`;
+    this.runTable = `${schema}${this.runTableName}`;
     this.stepTable = `${schema}${prefix}_step`;
     this.ensureSchema = options.ensureSchema ?? true;
   }
@@ -207,11 +210,11 @@ export class PostgresRunStore implements RunStore {
          )`,
       );
       await this.db.query(
-        `create index if not exists ${this.runTable}_by_status
+        `create index if not exists ${this.runTableName}_by_status
            on ${this.runTable} (workflow, status)`,
       );
       await this.db.query(
-        `create index if not exists ${this.runTable}_prunable
+        `create index if not exists ${this.runTableName}_prunable
            on ${this.runTable} (updated_at)
            where status in ('completed', 'failed', 'cancelled')`,
       );

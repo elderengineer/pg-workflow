@@ -26,6 +26,21 @@ describe("PostgresRunStore schema creation", () => {
     expect(db.queries.filter((statement) => statement.startsWith("select"))).toHaveLength(2);
   });
 
+  it("qualifies the table but not the index name, which Postgres rejects", async () => {
+    const db = new RecordingExecutor();
+    const store = new PostgresRunStore({ db, schema: "bookette_jobs" });
+
+    await store.load("missing");
+
+    const indexes = db.queries.filter((statement) => statement.startsWith("create index"));
+    expect(indexes).toHaveLength(2);
+    for (const statement of indexes) {
+      const name = statement.match(/create index if not exists (\S+)/)?.[1];
+      expect(name).not.toContain(".");
+      expect(statement).toContain('on "bookette_jobs".pg_workflow_run');
+    }
+  });
+
   it("runs no DDL when ensureSchema is false, for a least-privilege role", async () => {
     const db = new RecordingExecutor();
     const store = new PostgresRunStore({
