@@ -89,7 +89,7 @@ This is deliberately a small engine, not a platform:
 ## A taste of the API
 
 ```ts
-import { WorkflowEngine, InMemoryQueue, createWorkflow } from "pg-workflow";
+import { WorkflowEngine, InMemoryQueue, createWorkflow } from "@elderengineer/pg-workflow";
 
 const engine = new WorkflowEngine(new InMemoryQueue());
 await engine.start();

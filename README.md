@@ -9,7 +9,20 @@ Ships `InMemoryQueue` (tests, local dev, zero infrastructure) and a
 
 ## Install
 
-Not on a registry yet — releases go to GitHub first:
+Published to GitHub Packages. Point npm at the registry and authenticate once —
+public packages here still require a token with `read:packages`:
+
+```sh
+# .npmrc
+@elderengineer:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+```sh
+npm install @elderengineer/pg-workflow
+```
+
+Alternatively, install straight from git (no registry or token):
 
 ```sh
 npm install github:elderengineer/pg-workflow
@@ -24,7 +37,7 @@ npm install pg pg-boss
 ## Quick start
 
 ```ts
-import { WorkflowEngine, InMemoryQueue, createWorkflow } from "pg-workflow";
+import { WorkflowEngine, InMemoryQueue, createWorkflow } from "@elderengineer/pg-workflow";
 
 const engine = new WorkflowEngine(new InMemoryQueue(), {
   onError: ({ workflow, step, error }) => console.error(workflow, step, error),
@@ -53,7 +66,7 @@ The engine only depends on the `Queue` interface
 `stop`), so any backend works without touching workflow definitions.
 
 ```ts
-import { WorkflowEngine, PgBossQueue } from "pg-workflow";
+import { WorkflowEngine, PgBossQueue } from "@elderengineer/pg-workflow";
 
 const engine = new WorkflowEngine(
   new PgBossQueue({
@@ -120,7 +133,7 @@ rehydrated automatically after serialization.
 (default UTC):
 
 ```ts
-import { duration, TimeUnit, type LocalDayTime } from "pg-workflow";
+import { duration, TimeUnit, type LocalDayTime } from "@elderengineer/pg-workflow";
 
 const friday8am: LocalDayTime = { dayOfTheWeek: 5, time: duration(8, TimeUnit.HOURS) };
 await engine.trigger(wf, data, { publish: { startAt: friday8am, timezone: "Asia/Tokyo" } });

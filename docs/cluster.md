@@ -53,7 +53,7 @@ when the process exits:
 
 ```ts
 import { Pool } from "pg";
-import { PgBossQueue, PostgresRunStore, WorkflowEngine } from "pg-workflow";
+import { PgBossQueue, PostgresRunStore, WorkflowEngine } from "@elderengineer/pg-workflow";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const store = new PostgresRunStore({ db: pool }); // creates its tables on first use

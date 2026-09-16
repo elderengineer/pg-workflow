@@ -5,6 +5,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 While pre-1.0, a **minor** version may contain breaking changes.
 
+## [0.1.2] - 2026-09-16
+
+Publish to GitHub Packages. The published name is scoped to the owner, so the
+import specifier changes.
+
+### Changed
+
+- **Breaking:** the package is now `@elderengineer/pg-workflow` (was
+  `pg-workflow`), required by the GitHub Packages npm registry. Update imports
+  and the `.npmrc` registry entry accordingly.
+- `repository.url` corrected to the canonical HTTPS URL; GitHub rejects a
+  publish whose `repository` does not match the repository.
+- `Release` now publishes the tarball to GitHub Packages (`npm.pkg.github.com`)
+  before attaching it to the GitHub release.
+
 ## [0.1.1] - 2026-09-15
 
 Dev toolchain refresh. No runtime changes.

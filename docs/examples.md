@@ -11,7 +11,7 @@ import {
   TimeUnit,
   type Context,
   type QueueEvent,
-} from "pg-workflow";
+} from "@elderengineer/pg-workflow";
 ```
 
 For the conceptual model behind these, see
@@ -226,7 +226,7 @@ the process exits.
 
 ```ts
 import { Pool } from "pg";
-import { PgBossQueue, PostgresRunStore, WorkflowEngine } from "pg-workflow";
+import { PgBossQueue, PostgresRunStore, WorkflowEngine } from "@elderengineer/pg-workflow";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const store = new PostgresRunStore({ db: pool }); // creates its tables on first use
@@ -286,7 +286,7 @@ import type {
   PublishOptions,
   ScheduleOptions,
   StopOptions,
-} from "pg-workflow";
+} from "@elderengineer/pg-workflow";
 
 class MyQueue implements Queue {
   private stopped = false;
@@ -327,7 +327,13 @@ Implement `Step<In, Out>` to add behaviour the builder doesn't cover, e.g.
 timing or metrics around any step.
 
 ```ts
-import type { Context, PublishOptions, QueueEvent, Step, StepResult } from "pg-workflow";
+import type {
+  Context,
+  PublishOptions,
+  QueueEvent,
+  Step,
+  StepResult,
+} from "@elderengineer/pg-workflow";
 
 class TimingStep implements Step<unknown, unknown> {
   readonly name: string;
@@ -365,7 +371,7 @@ class TimingStep implements Step<unknown, unknown> {
 firing it; `fireSchedule()` triggers it on demand.
 
 ```ts
-import { InMemoryQueue, WorkflowEngine, createWorkflow } from "pg-workflow";
+import { InMemoryQueue, WorkflowEngine, createWorkflow } from "@elderengineer/pg-workflow";
 
 it("runs a workflow", async () => {
   const queue = new InMemoryQueue();

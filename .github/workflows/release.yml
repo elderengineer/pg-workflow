@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   release:
@@ -33,6 +34,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          registry-url: https://npm.pkg.github.com
       - run: npm ci
       - run: npm run build
       - run: npm run lint
@@ -41,6 +43,10 @@ jobs:
       - run: npm run test:integration
       - name: Pack
         run: npm pack
+      - name: Publish to GitHub Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm publish
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -48,4 +54,4 @@ jobs:
           gh release create "${GITHUB_REF_NAME}" \
             --title "${GITHUB_REF_NAME}" \
             --notes-file CHANGELOG.md \
-            pg-workflow-*.tgz
+            elderengineer-pg-workflow-*.tgz
