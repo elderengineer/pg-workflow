@@ -136,6 +136,16 @@ export interface PostgresRunStoreOptions {
   schema?: string;
   /** Table name prefix. Default `pg_workflow`. */
   tablePrefix?: string;
+  /**
+   * Create the run tables on first use. Default `true`.
+   *
+   * Set `false` where a migration role has already created them and the
+   * application role may not run DDL: `CREATE TABLE`/`CREATE INDEX` require
+   * `CREATE` on the schema and, for an index, ownership of the table, so a
+   * least-privilege application role cannot run `migrate()`. The caller then
+   * owns ensuring the tables exist before the store is used.
+   */
+  ensureSchema?: boolean;
 }
 
 interface RunRow {
@@ -160,6 +170,7 @@ export class PostgresRunStore implements RunStore {
   private readonly db: SqlExecutor;
   private readonly runTable: string;
   private readonly stepTable: string;
+  private readonly ensureSchema: boolean;
   private migrated: Promise<void> | undefined;
 
   constructor(options: PostgresRunStoreOptions) {
@@ -168,48 +179,53 @@ export class PostgresRunStore implements RunStore {
     const schema = options.schema ? `"${options.schema}".` : "";
     this.runTable = `${schema}${prefix}_run`;
     this.stepTable = `${schema}${prefix}_step`;
+    this.ensureSchema = options.ensureSchema ?? true;
   }
 
   private migrate(): Promise<void> {
     if (!this.migrated) {
-      this.migrated = (async () => {
-        await this.db.query(
-          `create table if not exists ${this.runTable} (
-             id text primary key,
-             workflow text not null,
-             version integer not null,
-             status text not null,
-             state jsonb not null default '{}',
-             current_step text,
-             attempts jsonb not null default '{}',
-             last_error text,
-             created_at timestamptz not null default now(),
-             updated_at timestamptz not null default now(),
-             completed_at timestamptz
-           )`,
-        );
-        await this.db.query(
-          `create index if not exists ${this.runTable}_by_status
-             on ${this.runTable} (workflow, status)`,
-        );
-        await this.db.query(
-          `create index if not exists ${this.runTable}_prunable
-             on ${this.runTable} (updated_at)
-             where status in ('completed', 'failed', 'cancelled')`,
-        );
-        await this.db.query(
-          `create table if not exists ${this.stepTable} (
-             run_id text not null references ${this.runTable} (id) on delete cascade,
-             step text not null,
-             attempt integer not null,
-             next jsonb not null,
-             completed_at timestamptz not null default now(),
-             primary key (run_id, step, attempt)
-           )`,
-        );
-      })();
+      this.migrated = this.ensureSchema ? this.createTables() : Promise.resolve();
     }
     return this.migrated;
+  }
+
+  private createTables(): Promise<void> {
+    return (async () => {
+      await this.db.query(
+        `create table if not exists ${this.runTable} (
+           id text primary key,
+           workflow text not null,
+           version integer not null,
+           status text not null,
+           state jsonb not null default '{}',
+           current_step text,
+           attempts jsonb not null default '{}',
+           last_error text,
+           created_at timestamptz not null default now(),
+           updated_at timestamptz not null default now(),
+           completed_at timestamptz
+         )`,
+      );
+      await this.db.query(
+        `create index if not exists ${this.runTable}_by_status
+           on ${this.runTable} (workflow, status)`,
+      );
+      await this.db.query(
+        `create index if not exists ${this.runTable}_prunable
+           on ${this.runTable} (updated_at)
+           where status in ('completed', 'failed', 'cancelled')`,
+      );
+      await this.db.query(
+        `create table if not exists ${this.stepTable} (
+           run_id text not null references ${this.runTable} (id) on delete cascade,
+           step text not null,
+           attempt integer not null,
+           next jsonb not null,
+           completed_at timestamptz not null default now(),
+           primary key (run_id, step, attempt)
+         )`,
+      );
+    })();
   }
 
   private toRecord(row: RunRow): RunRecord {
