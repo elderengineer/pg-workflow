@@ -66,6 +66,22 @@ they see the same run rows. The store creates `pg_workflow_run` and
 `pg_workflow_step` (prefix overridable) on first use; they live in the same
 database as `pgboss`, not inside its schema.
 
+**A least-privilege application role cannot create them.** `CREATE TABLE`
+needs `CREATE` on the schema and `CREATE INDEX` needs ownership of the table, so
+an application role granted only DML cannot run `migrate()`. Where a migration
+role owns the schema and creates the tables, pass `ensureSchema: false` and the
+store runs no DDL; the caller (the migration role) owns ensuring the tables
+exist. Postgres also rejects a schema name with the reserved `pg_` prefix, so
+name one such as `bookette_jobs`.
+
+```ts
+const store = new PostgresRunStore({
+  db: pool, // the application role's pool
+  schema: "bookette_jobs",
+  ensureSchema: false, // the migration role already created the tables
+});
+```
+
 ### Transactional steps (optional)
 
 To make a step's **database** side effects commit atomically with its run-state

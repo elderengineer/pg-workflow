@@ -5,6 +5,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 While pre-1.0, a **minor** version may contain breaking changes.
 
+## [0.1.3] - 2026-09-16
+
+### Added
+
+- `PostgresRunStoreOptions.ensureSchema` (default `true`). Set it to `false` where
+  a migration role creates the run tables and the application role may not run
+  DDL: a least-privilege role with only `SELECT`/`INSERT`/`UPDATE`/`DELETE` cannot
+  run `CREATE TABLE` or `CREATE INDEX`, so the store must not attempt `migrate()`.
+
 ## [0.1.2] - 2026-09-16
 
 Publish to GitHub Packages. The published name is scoped to the owner, so the
