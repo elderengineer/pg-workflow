@@ -21,6 +21,13 @@ While pre-1.0, a **minor** version may contain breaking changes.
   an index name cannot carry a schema. The table is still qualified; the index
   name is now unqualified, so it is created beside its table.
 
+### Changed
+
+- The package is now published to the public npm registry
+  (registry.npmjs.org) as well as GitHub Packages. npm releases use GitHub
+  Actions trusted publishing (OIDC); the `publishConfig` registry pin was
+  removed, so `npm install @elderengineer/pg-workflow` needs no `.npmrc`.
+
 ## [0.1.2] - 2026-09-16
 
 Publish to GitHub Packages. The published name is scoped to the owner, so the

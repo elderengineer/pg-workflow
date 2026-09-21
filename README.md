@@ -9,20 +9,13 @@ Ships `InMemoryQueue` (tests, local dev, zero infrastructure) and a
 
 ## Install
 
-Published to GitHub Packages. Point npm at the registry and authenticate once —
-public packages here still require a token with `read:packages`:
-
-```sh
-# .npmrc
-@elderengineer:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
+Published to npm:
 
 ```sh
 npm install @elderengineer/pg-workflow
 ```
 
-Alternatively, install straight from git (no registry or token):
+Alternatively, install straight from git (no registry):
 
 ```sh
 npm install github:elderengineer/pg-workflow
