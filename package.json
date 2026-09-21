@@ -28,7 +28,8 @@
     "url": "https://github.com/elderengineer/pg-workflow.git"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
     "prepack": "npm run build",
     "pack:dry": "npm pack --dry-run",
     "test": "jest tests/unit --runInBand --forceExit",
