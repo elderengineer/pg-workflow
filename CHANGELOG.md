@@ -5,6 +5,23 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 While pre-1.0, a **minor** version may contain breaking changes.
 
+## [0.1.4] - 2026-09-21
+
+### Fixed
+
+- The npmjs tarball for 0.1.3 shipped 14 stale `dist/` files left over from two
+  older source layouts, because `npm run build` never cleaned `dist/` and the
+  machine that published had accumulated output across the renames. Among them
+  a stale `dist/queue.js` barrel (an empty module from before the `queue/`
+  directory) shadowed the real `dist/queue/index.js` for both Node module
+  resolution and `tsc`: types added since the rename (`QueueEvent`,
+  `DeliveryScope`, `QueueStats`, `Queue.stats()`) were invisible to consumers'
+  compilers, and any root-barrel value import of queue exports resolved to
+  `undefined`. The build is now self-cleaning — `npm run build` removes `dist/`
+  first (`npm run clean && tsc -p tsconfig.build.json`) — so a stale `dist/`
+  can never leak into a pack, wherever a publish runs from. `prepack` runs
+  `build`, which covers `npm publish` and `npm pack`.
+
 ## [0.1.3] - 2026-09-16
 
 ### Added
